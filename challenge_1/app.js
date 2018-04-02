@@ -8,19 +8,19 @@ var board = [
     [null,null,null],
     [null,null,null]
 ];
-var win = false;
-
+var gameOver = false;
+ 
 var swapPlayer = function(){
     if (playerSymbol === "X"){
-        playerSymbol = "0";
+        playerSymbol = "O";
     } else {
         playerSymbol = "X"
     }
 }
 var winAction = function(){
     console.log('win!');
-    win = true; 
-    document.getElementsByTagName
+    gameOver = true; 
+    document.getElementById('winner').innerHTML = `Player ${playerSymbol} Wins!!!!!`;
 }
 
 var checkWin = function(coords,symbol){
@@ -62,51 +62,45 @@ var checkWin = function(coords,symbol){
 
     if (checkRow() || checkCol() || checkDiags()){
         winAction();
-        return true; 
     }
-    return false;
+}
 
+var checkTie = function(){
+    if (!gameOver && board.every(innerArr => !innerArr.includes(null))){
+        gameOver = true;
+        document.getElementById('winner').innerHTML = `Everyone is a winner!!`;
+    }
+    
 }
 var addToBoard = function(coords){
     board[coords[0]][coords[1]] = playerSymbol;
     checkWin(coords, playerSymbol);
-    if (!win) swapPlayer();
+    checkTie();
+    if (!gameOver) swapPlayer();
 }
-
-
-/* <section class = "board">
-            <div class = "row r1" style="padding:20px;">
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "00"></span>
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "01"></span> 
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "02"></span>
-            </div> */
-var render = function(){
-    var rowIndex = 0;
-    board.forEach(innerArr => {
-        $div = document.createElement("div");
-        $div.style = "padding:20px;";
-        document.getElementById("board").appendChild($div);
-        var colIndex = 0;
-        innerArr.forEach(space => {
-            $span = document.createElement("span");
-            $span.innerHTML = board[rowIndex][colIndex] || "";
-            $span.id = "" + rowIndex + colIndex;
-            $span.style =  "border:1px solid black;padding:20px;";
-            $div.appendChild($span);
-            $span.addEventListener('click', function(event){
-                if (!this.innerHTML && !win){
-                    this.innerHTML = playerSymbol;
-                    addToBoard(this.id.split(""));
-                }
-            });
-            colIndex++;
-        });
-        rowIndex++;
-    });   
+var resetGame = function(){
+    document.getElementById('winner').innerHTML = '';
+    playerSymbol = "X";
+    gameOver = false;
+    board.forEach((innerArr, i) => board[i] = [null,null,null])
+    spaces = document.getElementsByClassName("space");
+    Array.prototype.forEach.call(spaces, space => {
+        space.innerHTML = '';
+    })
 }
 
 //Controller/View
 document.addEventListener('DOMContentLoaded', function() {
-    render();
-    
+    spaces = document.getElementsByClassName("space");
+    Array.prototype.forEach.call(spaces, space => {
+        space.addEventListener('click', function(event){
+            if (this.innerHTML === "" && !gameOver){
+                this.innerHTML = playerSymbol;
+                addToBoard(this.id.split(""));
+            }
+        });
+    });
+    document.getElementById("newGame").addEventListener('click', function(event){
+        resetGame(); 
+    })   
 });

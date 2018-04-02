@@ -20,6 +20,7 @@ var swapPlayer = function(){
 var winAction = function(){
     console.log('win!');
     win = true; 
+    document.getElementsByTagName
 }
 
 var checkWin = function(coords,symbol){
@@ -72,15 +73,40 @@ var addToBoard = function(coords){
     if (!win) swapPlayer();
 }
 
+
+/* <section class = "board">
+            <div class = "row r1" style="padding:20px;">
+                <span style="border:1px solid black;padding:20px;" class = "space" id = "00"></span>
+                <span style="border:1px solid black;padding:20px;" class = "space" id = "01"></span> 
+                <span style="border:1px solid black;padding:20px;" class = "space" id = "02"></span>
+            </div> */
+var render = function(){
+    var rowIndex = 0;
+    board.forEach(innerArr => {
+        $div = document.createElement("div");
+        $div.style = "padding:20px;";
+        document.getElementById("board").appendChild($div);
+        var colIndex = 0;
+        innerArr.forEach(space => {
+            $span = document.createElement("span");
+            $span.innerHTML = board[rowIndex][colIndex] || "";
+            $span.id = "" + rowIndex + colIndex;
+            $span.style =  "border:1px solid black;padding:20px;";
+            $div.appendChild($span);
+            $span.addEventListener('click', function(event){
+                if (!this.innerHTML && !win){
+                    this.innerHTML = playerSymbol;
+                    addToBoard(this.id.split(""));
+                }
+            });
+            colIndex++;
+        });
+        rowIndex++;
+    });   
+}
+
 //Controller/View
 document.addEventListener('DOMContentLoaded', function() {
-    spaces = document.getElementsByClassName("space");
-    Array.prototype.forEach.call(spaces, space => {
-        space.addEventListener('click', function(event){
-            if (this.innerHTML === "" && !win){
-                this.innerHTML = playerSymbol;
-                addToBoard(this.id.split(""));
-            }
-        });
-    });
+    render();
+    
 });

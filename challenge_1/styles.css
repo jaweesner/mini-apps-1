@@ -21,7 +21,7 @@ btn:hover{
     cursor: pointer;
     border: 5px black solid;
 }
-.board{
+#innerBoard{
     width: 50%;
     margin: auto;
     margin-top: 5%;

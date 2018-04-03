@@ -1,19 +1,25 @@
 
 //Model
 var Player = {
-    currentPlayer: "X",
-    playerWins: {
-        X:0,
-        O:0
+    currentPlayer: this.player1,
+    player1: {
+        symbol: "X",
+        name: "PlayerOne",
+        wins: 0
+    },
+    player2: {
+        symbol: "O",
+        name: "PlayerTwo",
+        wins: 0
     },
     lastWinner: null,
     swapPlayer(){
-        if (this.currentPlayer === "X"){
-            this.currentPlayer = "O";
+        if (this.currentPlayer === this.player1){
+            this.currentPlayer = this.player2;
         } else {
-            this.currentPlayer = "X"
+            this.currentPlayer = this.player1
         }
-        document.getElementById('playerTurn').innerHTML = `Player ${this.currentPlayer}'s Turn`
+        document.getElementById('playerTurn').innerHTML = `${this.currentPlayer.name}'s Turn`
     }
 }
 
@@ -23,12 +29,13 @@ var Game = {
         [null,null,null],
         [null,null,null]
     ],
-    gameOver: false,
-    resetGame(){   
+    gameOver: false
+}
+Game.resetGame = function(){   
         document.getElementById('winner').innerHTML = '';
         Player.currentPlayer = Player.lastWinner
         Player.swapPlayer();
-        document.getElementById('playerTurn').innerHTML = `Player ${Player.currentPlayer}'s Turn`
+        document.getElementById('playerTurn').innerHTML = `${Player.currentPlayer.name}'s Turn`
         this.gameOver = false;
         this.board = [
             [null,null,null],
@@ -39,27 +46,61 @@ var Game = {
         Array.prototype.forEach.call(spaces, space => {
             space.innerHTML = '';
         })
-        document.getElementById('xwins').innerHTML = `X: ${Player.playerWins.X}`
-        document.getElementById('owins').innerHTML = `O: ${Player.playerWins.O}`
-    },
-    addToBoard(coords){
+        document.getElementById('xwins').innerHTML = `${Player.player1.symbol}: ${Player.player1.wins}`
+        document.getElementById('owins').innerHTML = `${Player.player2.symbol}: ${Player.player2.wins}`
+        this.render();
+    }
+    Game.addToBoard = function(coords){
         if (this.board[coords[0]][coords[1]]===null && !this.gameOver){
-            this.board[coords[0]][coords[1]] = Player.currentPlayer;
-            document.getElementById(""+coords[0]+coords[1]).innerHTML = Player.currentPlayer;
-            this.checkWin(coords, Player.currentPlayer);
+            this.board[coords[0]][coords[1]] = Player.currentPlayer.symbol;
+            document.getElementById(""+coords[0]+coords[1]).innerHTML = Player.currentPlayer.symbol;
+            this.rotateBoard();
+            this.gravity();
+            this.checkWin();
             this.checkTie();
+            this.render();
             if (!this.gameOver) Player.swapPlayer();
         }    
-    },
-    winAction(){
+    }
+    Game.winAction = function(winner){
+        if (!winner) return;
         this.gameOver = true; 
-        Player.lastWinner = Player.currentPlayer;
-        Player.playerWins[Player.currentPlayer] = (Player.playerWins[Player.currentPlayer]) ?  ++(Player.playerWins[Player.currentPlayer]) : 1; 
-        document.getElementById('winner').innerHTML = `Player ${Player.currentPlayer} Wins!!!!!`;
+        Player.lastWinner = winner;
+        winner.wins++;
+        document.getElementById('winner').innerHTML = `${winner.name} Wins!!!!!`;
 
-    },
-
-    checkWin(coords){
+    }
+    Game.rotateBoard = function(){
+        var newBoard = [
+            [null,null,null],
+            [null,null,null],
+            [null,null,null]
+        ];
+        var n = this.board.length-1;
+        for (var i = 0; i < this.board.length; i++){
+            for(var j = 0; j<this.board.length; j++){
+                newBoard[j][n-i] = this.board[i][j];
+            }
+        }
+        this.board = newBoard;
+    }
+    Game.gravity= function(){
+        var n = this.board.length-1;
+        for (var j = n-1 ; j >= 0 ; j--){
+            for(var i = 0; i<=n; i++){
+                if (this.board[j+1][i] === null){
+                    this.board[j+1][i] = this.board[j][i];
+                    this.board[j][i] = null;
+                    if(j+2<=n && this.board[j+2][i] === null){
+                        this.board[j+2][i]  = this.board[j+1][i]; 
+                        this.board[j+1][i] =null;
+                    }
+                }
+            }     
+            
+        }
+    }
+    Game.checkWin= function(){
     /*
     * win conditions defined as:
     * A. all vals in row array are equal to player
@@ -69,46 +110,51 @@ var Game = {
     *   Check each 0+i, 0 +i  ||  i,n-1-i
     */
         var checkRow = function(){
-            return Game.board[coords[0]].every((val) => val === Player.currentPlayer);
+            if (Game.board.any(row => row.every((val) => val === Player.player1.symbol))){
+                return Player.player1;
+            }else if(Game.board.every(row => row.every((val) => val === Player.player2.symbol))){
+                return Player.player2;
+            }return false;
         }
         var checkCol = function(){
-            return Game.board.every(innerArr => innerArr[coords[1]] === Player.currentPlayer);
+            if (Game.board.every(innerArr => innerArr[0] === Player.player1.symbol)){
+                return Player.player1;
+            }else if(Game.board.every(row => row.every((val) => val === Player.player2.symbol))){
+                return Player.player2;
+            } return false;     
+        }
+        var checkDiagsTruth = function(player){
+            n = Game.board.length-1; //just for reading ease
+            var i = j = -1;
+            return Game.board.every(innerArr => {
+                    i++;
+                    return innerArr[i]=== player.symbol;
+                }) || Game.board.every(innerArr => {
+                    j++;
+                    return innerArr[n-j] === player.symbol;
+                })   
         }
         var checkDiags = function(){
-            n = Game.board.length-1; //just for reading ease
-            if (coords[0] === coords[1]){
-                let i = -1;
-                if (Game.board.every(innerArr => {
-                    i++;
-                    return innerArr[i]=== Player.currentPlayer;
-                })){
-                    return true;
-                }
-            } else if (Number(coords[0]) + Number(coords[1]) === n){
-                let i = -1;
-                if (Game.board.every(innerArr => {
-                    i++;
-                    return innerArr[n-i] === Player.currentPlayer;
-                })){
-                    return true;
-                }   
+            if (checkDiagsTruth(Player.player1)){
+                return Player.player1;
+            }
+            if (checkDiagsTruth(Player.player2)){
+                return Player.player2;
             }
             return false;
         }
 
-        if (checkRow() || checkCol() || checkDiags()){
-            this.winAction();
-        }
-    },
+            this.winAction(checkRow() || checkCol() || checkDiags());
 
-    checkTie(){
+    }
+
+Game.checkTie = function(){
         if (!this.gameOver && this.board.every(innerArr => !innerArr.includes(null))){
             this.gameOver = true;
             document.getElementById('winner').innerHTML = `Everyone is a winner!!`;
         }
         
     }
-}
 //Controller/View
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event){
@@ -120,4 +166,33 @@ document.addEventListener('DOMContentLoaded', function() {
         Game.resetGame(); 
     })   
 });
+
+
+Game.render = function(){
+    var rowIndex = 0;
+    document.getElementById('xwins').innerHTML = `${Player.player1.symbol}: ${Player.player1.wins}`
+    document.getElementById('owins').innerHTML = `${Player.player2.symbol}: ${Player.player2.wins}`
+    document.getElementById("innerBoard").innerHTML = "";
+    Game.board.forEach(innerArr => {
+        $div = document.createElement("div");
+        $div.className = "row";
+        document.getElementById("innerBoard").appendChild($div);
+        var colIndex = 0;
+        innerArr.forEach(space => {
+            $span = document.createElement("div");
+            $span.className = "space";
+            $span.innerHTML = this.board[rowIndex][colIndex] || "";
+            $span.id = "" + rowIndex + colIndex;
+            $div.appendChild($span);
+            // $span.addEventListener('click', function(event){
+            //     if (!this.innerHTML && !win){
+            //         this.innerHTML = playerSymbol;
+            //         addToBoard(this.id.split(""));
+            //     }
+            // });
+            colIndex++;
+        });
+        rowIndex++;
+    });   
+}
 Game.resetGame();

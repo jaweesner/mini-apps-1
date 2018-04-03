@@ -3,33 +3,47 @@
     <head>
         <title>Tic-Tac-Toe</title> 
         <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        
     </head>
     <body>
-        <div id = "playerWins">
-            WINS:
-            <div id = "xwins"></div>
-            <div id = "owins"></div>
-        </div>
-        <div id="playerTurn"></div>
-        <section class = "board">
-            <div class = "row r1" style="padding:20px;">
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "00"></span>
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "01"></span> 
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "02"></span>
+        <section class="header">
+            <div class="stats">
+                <div id = "playerWins">
+                    <h4>WINS</h4>
+                    <div id = "xwins"></div>
+                    <div id = "owins"></div>
+                </div>
             </div>
-            <div class = "row r2" style="padding:20px;">
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "10"></span>
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "11"></span> 
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "12"></span>
+            <div class="controls">
+                <btn id="newGame">New Game</btn>
+                <btn id="resetWins">Reset Wins</btn>
+                <btn id="toggleRotation">Rotatation Mode</btn>
             </div>
-            <div class = "row r3"style="padding:20px;">
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "20"></span>
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "21"></span> 
-                <span style="border:1px solid black;padding:20px;" class = "space" id = "22"></span>
-            </div>
+            
         </section>
-        <btn id="newGame" style = "border: 1px solid black;">New Game</btn>
-        <div id = "winner"></div>
+
+        <section class = "board">
+                <div id="playerTurn"></div>
+            <div class = "row r1" >
+                <div class = "space" id = "00"></div>
+                <div class = "space" id = "01"></div> 
+                <div class = "space" id = "02"></div>
+            </div>
+            <div class = "row r2" >
+                <div class = "space" id = "10"></div>
+                <div class = "space" id = "11"></div> 
+                <div class = "space" id = "12"></div>
+            </div>
+            <div class = "row r3">
+                <div class = "space" id = "20"></div>
+                <div class = "space" id = "21"></div> 
+                <div class = "space" id = "22"></div>
+            </div>
+            <div id = "winner"></div>
+        </section>
+      
         <script src="./app.js"></script>
     </body>
 </html>

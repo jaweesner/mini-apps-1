@@ -110,18 +110,27 @@ Game.resetGame = function(){
     *   Check each 0+i, 0 +i  ||  i,n-1-i
     */
         var checkRow = function(){
-            if (Game.board.any(row => row.every((val) => val === Player.player1.symbol))){
+            if (Game.board.some(row => row.every((val) => val === Player.player1.symbol))){
                 return Player.player1;
-            }else if(Game.board.every(row => row.every((val) => val === Player.player2.symbol))){
+            }else if(Game.board.some(row => row.every((val) => val === Player.player2.symbol))){
                 return Player.player2;
             }return false;
         }
         var checkCol = function(){
-            if (Game.board.every(innerArr => innerArr[0] === Player.player1.symbol)){
+            if(checkColTruth(Player.player1)){
                 return Player.player1;
-            }else if(Game.board.every(row => row.every((val) => val === Player.player2.symbol))){
+            }else if(checkColTruth(Player.player2)){
                 return Player.player2;
             } return false;     
+        }
+
+        var checkColTruth = function(player){
+            for (var i = 0; i<Game.board.length; i++){
+                if((Game.board[0][i] === Game.board[1][i])&&(Game.board[2][i] === player.symbol) && (Game.board[0][i] === player.symbol)){
+                    return true;
+                }
+            }
+            return false;
         }
         var checkDiagsTruth = function(player){
             n = Game.board.length-1; //just for reading ease

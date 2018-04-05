@@ -98,8 +98,9 @@ class Board extends React.Component {
 		if(this.state.board.every((col) => col.length === this.state.board.length)){ 
 			this.props.messageHandler("Oh no, a tie...")
 			this.props.onWin();
-
+			return true;
 		}
+		return false
 	}
 
 	checkWins(col, row){
@@ -135,8 +136,11 @@ class Board extends React.Component {
 		if (checkRowDiag(rowArr)||checkCol(this.state.board[col])||checkRowDiag(majorArr)||checkRowDiag(minorArr)){
 			this.props.messageHandler(turnAlias + " wins!!!")
 			this.props.onWin();
+			return true
 		}
+		return false
 	}
+
 	componentWillUpdate(){
 		if(this.state.board.length!==this.props.players.length*4){
 			this.state.board = [];
@@ -156,7 +160,8 @@ class Board extends React.Component {
 					index = {index} 
 					onClick = {this.columnClickHandler.bind(this)} 
 					playerNum = {this.props.players.length} 
-				/> )}
+				/> 
+			)}
 		</div>
 	}
 }
